@@ -1,42 +1,45 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import DiagnosticoForm from "@/components/DiagnosticoForm";
 
 export const metadata: Metadata = {
-  title: "Diagnóstico",
-  description: "Solicita un diagnóstico gratuito de ciberseguridad para tu empresa.",
+  title: "Diagnóstico de Protección",
+  description: "15 preguntas. Resultado inmediato. Descubre tus brechas de protección sin costo.",
 };
 
 export default function DiagnosticoPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-4xl font-bold mb-4">Diagnóstico de seguridad</h1>
-      <p className="text-lg text-gray-600 mb-8">
-        En una sesión inicial sin costo evalúo los riesgos más críticos de tu empresa y te entrego
-        un informe con prioridades claras y pasos concretos.
-      </p>
+    <>
+      <section style={{
+        maxWidth: "1100px",
+        margin: "0 auto",
+        padding: "80px 24px 56px",
+        textAlign: "center",
+      }}>
+        <div className="label-tag" style={{ marginBottom: "16px" }}>
+          DIAGNÓSTICO DE PROTECCIÓN
+        </div>
+        <h1 style={{
+          fontSize: "clamp(36px, 5vw, 52px)",
+          fontWeight: 800,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+          color: "var(--text)",
+          marginBottom: "16px",
+        }}>
+          Descubre dónde estás realmente.
+        </h1>
+        <p style={{
+          fontSize: "17px",
+          color: "var(--muted)",
+          lineHeight: 1.7,
+          maxWidth: "420px",
+          margin: "0 auto",
+        }}>
+          15 preguntas. Resultado inmediato. Sin costo.
+        </p>
+      </section>
 
-      <h2 className="text-xl font-semibold mb-4">¿Qué incluye?</h2>
-      <ul className="space-y-3 mb-10 text-gray-700">
-        {[
-          "Revisión de superficie de ataque externa",
-          "Evaluación de higiene de contraseñas y accesos",
-          "Análisis de proveedores y cadena de suministro digital",
-          "Cumplimiento básico LFPDPPP / ISO 27001",
-          "Informe ejecutivo con roadmap de 90 días",
-        ].map((item) => (
-          <li key={item} className="flex gap-2">
-            <span className="text-blue-600 font-bold">✓</span>
-            {item}
-          </li>
-        ))}
-      </ul>
-
-      <Link
-        href="/agenda"
-        className="inline-flex px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Agendar mi diagnóstico gratuito
-      </Link>
-    </div>
+      <DiagnosticoForm />
+    </>
   );
 }
