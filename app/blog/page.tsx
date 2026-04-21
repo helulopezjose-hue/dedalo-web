@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -15,7 +16,7 @@ export default function BlogPage() {
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 24px 96px" }}>
       <style>{`
-        .blog-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 200ms, transform 200ms; display: flex; flex-direction: column; }
+        .blog-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 200ms, transform 200ms; display: flex; flex-direction: column; text-decoration: none; }
         .blog-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }
         @media (max-width: 640px) { .blog-grid { grid-template-columns: 1fr !important; } }
       `}</style>
@@ -32,7 +33,7 @@ export default function BlogPage() {
 
       <div className="blog-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
         {posts.map(({ slug, category, categoryColor, icon, title, excerpt, date, readTime }) => (
-          <article key={slug} className="blog-card">
+          <Link key={slug} href={`/blog/${slug}`} className="blog-card">
             <div style={{ width: "100%", aspectRatio: "16/7", background: "linear-gradient(135deg, var(--surface) 0%, var(--card) 60%)", display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "1px solid var(--border)", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, opacity: 0.05, backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
               <span style={{ fontSize: "32px", opacity: 0.4, position: "relative" }}>{icon}</span>
@@ -49,7 +50,7 @@ export default function BlogPage() {
                 <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--accent-gold)" }}>Leer más →</span>
               </div>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
     </div>
