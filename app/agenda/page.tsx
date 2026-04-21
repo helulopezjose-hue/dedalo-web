@@ -2,35 +2,205 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Agenda una consulta",
-  description: "Reserva una sesión de consultoría o diagnóstico de ciberseguridad.",
+  description: "La primera sesión es gratuita. 30 minutos para entender tu situación y saber exactamente qué necesitas.",
 };
 
 export default function AgendaPage() {
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-4xl font-bold mb-4">Agenda una sesión</h1>
-      <p className="text-lg text-gray-600 mb-10">
-        Elige el tipo de sesión que necesitas y reserva directamente en mi calendario.
-        La primera consulta de diagnóstico es sin costo.
-      </p>
-
-      {/* Placeholder para integración de calendario (Cal.com / Calendly) */}
-      <div className="rounded-xl border-2 border-dashed border-gray-300 p-12 text-center text-gray-400">
-        <p className="text-sm font-medium">Calendario de reservas</p>
-        <p className="text-xs mt-1">Aquí se integrará Cal.com o Calendly</p>
-      </div>
-
-      <div className="mt-10 p-6 bg-blue-50 rounded-xl">
-        <p className="text-sm text-blue-800">
-          ¿Prefieres escribirme directamente?{" "}
-          <a
-            href="mailto:hola@dedaloproteccion.mx"
-            className="font-semibold underline hover:no-underline"
-          >
-            hola@dedaloproteccion.mx
-          </a>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 24px 96px" }}>
+      {/* Header */}
+      <div style={{ maxWidth: "580px", marginBottom: "64px" }}>
+        <div className="label-tag" style={{ marginBottom: "16px" }}>AGENDA UNA CONSULTA</div>
+        <h1 style={{
+          fontSize: "clamp(36px, 5vw, 52px)",
+          fontWeight: 800,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+          color: "var(--text)",
+          marginBottom: "16px",
+        }}>
+          La primera sesión<br />
+          <span style={{ color: "var(--accent-gold)" }}>es gratuita.</span>
+        </h1>
+        <p style={{ fontSize: "17px", color: "var(--muted)", lineHeight: 1.7 }}>
+          30 minutos para entender tu situación y saber exactamente qué necesitas.
+          Sin compromiso.
         </p>
       </div>
+
+      {/* Layout 2 columnas */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 360px",
+        gap: "32px",
+        alignItems: "start",
+      }}
+      className="agenda-grid"
+      >
+        {/* Calendario placeholder */}
+        <div style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "16px",
+          padding: "48px 32px",
+          minHeight: "360px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "16px",
+          textAlign: "center",
+        }}>
+          <div style={{
+            width: "64px", height: "64px", borderRadius: "12px",
+            background: "var(--surface)", border: "1px solid var(--border)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "26px",
+          }}>
+            📅
+          </div>
+          <div>
+            <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
+              Sistema de citas disponible próximamente
+            </p>
+            <p style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.6, maxWidth: "300px" }}>
+              Mientras tanto, contáctame directamente por cualquiera de los canales
+              a la derecha para agendar tu sesión.
+            </p>
+          </div>
+          <div style={{
+            display: "inline-block",
+            padding: "6px 16px",
+            border: "1px dashed var(--border-gold)",
+            borderRadius: "6px",
+            fontSize: "11px",
+            fontWeight: 600,
+            color: "var(--accent-gold)",
+            letterSpacing: "1px",
+          }}>
+            INTEGRACIÓN CAL.COM · EN BREVE
+          </div>
+        </div>
+
+        {/* Contacto directo */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {/* WhatsApp */}
+          <a
+            href="https://wa.me/521XXXXXXXXXX"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "12px",
+              padding: "20px",
+              textDecoration: "none",
+              transition: "border-color 200ms",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = "#25D366")}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+          >
+            <div style={{
+              width: "44px", height: "44px", borderRadius: "10px",
+              background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "20px", flexShrink: 0,
+            }}>
+              💬
+            </div>
+            <div>
+              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "3px" }}>
+                WhatsApp
+              </div>
+              <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text)" }}>
+                +52 1 (XXX) XXX-XXXX
+              </div>
+            </div>
+          </a>
+
+          {/* Email */}
+          <a
+            href="mailto:hola@dedaloproteccion.mx"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "12px",
+              padding: "20px",
+              textDecoration: "none",
+              transition: "border-color 200ms",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--border-blue)")}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+          >
+            <div style={{
+              width: "44px", height: "44px", borderRadius: "10px",
+              background: "var(--accent-gold-muted)", border: "1px solid var(--border-gold)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "20px", flexShrink: 0,
+            }}>
+              ✉️
+            </div>
+            <div>
+              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "3px" }}>
+                Email
+              </div>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text)" }}>
+                hola@dedaloproteccion.mx
+              </div>
+            </div>
+          </a>
+
+          {/* Nota */}
+          <div style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "10px",
+            padding: "16px 18px",
+          }}>
+            <p style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.65, margin: 0 }}>
+              ⏱ Respondo en menos de 24 horas en días hábiles.
+              La primera consulta es completamente gratuita y sin compromiso.
+            </p>
+          </div>
+
+          {/* Lo que incluye */}
+          <div style={{
+            background: "var(--card)",
+            border: "1px solid var(--border-blue)",
+            borderRadius: "12px",
+            padding: "20px",
+          }}>
+            <div className="label-tag" style={{ marginBottom: "12px" }}>LA SESIÓN INCLUYE</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {[
+                "Revisión de tu situación actual",
+                "Identificación de brechas prioritarias",
+                "Opciones de cobertura con costos reales",
+                "Sin presión ni compromiso de compra",
+              ].map(item => (
+                <div key={item} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                  <span style={{ color: "var(--accent-gold)", fontSize: "12px", marginTop: "2px", flexShrink: 0 }}>◈</span>
+                  <span style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.5 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .agenda-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
