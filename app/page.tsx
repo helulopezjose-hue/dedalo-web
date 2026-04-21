@@ -1,65 +1,76 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Inicio",
+  description: "Consultoría en ciberseguridad y protección de datos para empresas mexicanas.",
+};
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-6">
+          Protege tu empresa con una{" "}
+          <span className="text-blue-600">estrategia de ciberseguridad real</span>
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+          Ayudo a empresas mexicanas a identificar sus riesgos digitales, cumplir con la normativa y
+          construir una cultura de seguridad duradera.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/diagnostico"
+            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Solicitar diagnóstico gratuito
+          </Link>
+          <Link
+            href="/sobre-mi"
+            className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 transition-colors"
           >
-            Documentation
-          </a>
+            Conocer más
+          </Link>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Servicios */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">¿En qué puedo ayudarte?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Diagnóstico de seguridad",
+                desc: "Evalúo el estado actual de tu empresa y te entrego un plan de acción priorizado.",
+                href: "/diagnostico",
+              },
+              {
+                title: "Consultoría estratégica",
+                desc: "Defino junto a tu equipo las políticas, controles y procesos necesarios.",
+                href: "/agenda",
+              },
+              {
+                title: "Formación y concienciación",
+                desc: "Talleres prácticos para que tu equipo identifique y evite amenazas.",
+                href: "/agenda",
+              },
+            ].map(({ title, desc, href }) => (
+              <Link
+                key={title}
+                href={href}
+                className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
+              >
+                <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-sm">{desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
