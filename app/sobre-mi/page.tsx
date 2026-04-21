@@ -6,14 +6,7 @@ export const metadata: Metadata = {
   description: "José G. Helú — Asesor de seguros con Cédula A. DÉDALO · Arquitectura de Protección.",
 };
 
-const credentials = [
-  "Cédula A",
-  "AXA México",
-  "Vida",
-  "GMM",
-  "Auto",
-  "Hogar",
-];
+const credentials = ["Cédula A", "AXA México", "Vida", "GMM", "Auto", "Hogar"];
 
 export default function SobreMiPage() {
   return (
@@ -45,7 +38,7 @@ export default function SobreMiPage() {
       }}
       className="sobre-mi-grid"
       >
-        {/* Columna izquierda: texto */}
+        {/* Texto */}
         <div>
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {[
@@ -77,23 +70,20 @@ export default function SobreMiPage() {
                 padding: "13px 28px",
                 borderRadius: "8px",
                 textDecoration: "none",
-                transition: "background 200ms",
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = "var(--accent-blue-light)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "var(--accent-blue)")}
             >
               Agenda una consulta →
             </Link>
           </div>
         </div>
 
-        {/* Columna derecha: credenciales + avatar */}
+        {/* Columna derecha */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {/* Avatar placeholder */}
+          {/* Avatar */}
           <div style={{
             width: "100%",
-            aspectRatio: "1",
             maxWidth: "280px",
+            aspectRatio: "1",
             borderRadius: "16px",
             background: "var(--card)",
             border: "1px solid var(--border)",
@@ -140,15 +130,34 @@ export default function SobreMiPage() {
               ))}
             </div>
           </div>
+
+          {/* Contacto directo */}
+          <div style={{
+            background: "var(--card)",
+            border: "1px solid var(--border-blue)",
+            borderRadius: "12px",
+            padding: "20px",
+          }}>
+            <div className="label-tag" style={{ marginBottom: "14px" }}>CONTACTO DIRECTO</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <a href="mailto:jose@dedaloproteccion.mx" style={{
+                fontSize: "14px", color: "var(--accent-gold)", textDecoration: "none",
+              }}>
+                jose@dedaloproteccion.mx
+              </a>
+              <a href="https://wa.me/526861085164" target="_blank" rel="noopener noreferrer" style={{
+                fontSize: "14px", color: "var(--muted)", textDecoration: "none",
+              }}>
+                WhatsApp +52 686 108 5164
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
       <style>{`
         @media (max-width: 768px) {
-          .sobre-mi-grid {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
+          .sobre-mi-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
         }
       `}</style>
     </div>

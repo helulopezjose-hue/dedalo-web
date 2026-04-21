@@ -15,8 +15,8 @@ const PROFILES: Record<string, {
     cta: "Agenda tu diagnóstico gratuito — en 30 minutos sabrás exactamente qué necesitas y cuánto cuesta proteger lo que más importa.",
     cadence: "🔴 Contacto recomendado: hoy mismo",
   },
-  constructor: {
-    id: "constructor", label: "Constructor patrimonial", icon: "🏗️", color: "var(--accent-gold)",
+  patrimonio: {
+    id: "patrimonio", label: "Constructor patrimonial", icon: "🏗️", color: "var(--accent-gold)",
     heading: "Tienes algo que muy pocas personas aprovechan: el tiempo a tu favor.",
     body: "A tu edad, protegerte cuesta una fracción de lo que costará en cinco años. Y cada mes que pasa sin una estructura de protección es un mes en que estás construyendo sobre terreno expuesto.\n\nLa buena noticia es que tu situación es ideal para diseñar algo que no solo te proteja — sino que también trabaje para ti a largo plazo.",
     cta: "Agenda tu diagnóstico gratuito — te muestro cómo protegerte hoy y construir patrimonio al mismo tiempo.",
@@ -38,7 +38,7 @@ const PROFILES: Record<string, {
   },
 };
 
-const questions = [
+const questions: Question[] = [
   { id: "birthYear", section: "Tu perfil", question: "¿En qué año naciste?", type: "select",
     options: Array.from({ length: 57 }, (_, i) => ({ label: String(2005 - i), value: String(2005 - i) })) },
   { id: "civilStatus", section: "Tu perfil", question: "¿Cuál es tu estado civil?", type: "single",
@@ -66,6 +66,16 @@ const questions = [
     options: [{ label: "Menos de $500 al mes", value: "very-low", icon: "💰" }, { label: "$500 a $1,500 al mes", value: "low", icon: "💰" }, { label: "$1,500 a $3,500 al mes", value: "mid", icon: "💰" }, { label: "$3,500 a $7,000 al mes", value: "mid-high", icon: "💰" }, { label: "Más de $7,000 al mes", value: "high", icon: "💰" }, { label: "Depende de lo que me recomienden", value: "open", icon: "🤝" }] },
   { id: "contact", section: "Para enviarte tu diagnóstico", question: "¿A dónde te enviamos tu reporte completo?", type: "contact" },
 ];
+
+type QuestionOption = { label: string; value: string; icon?: string };
+type Question = {
+  id: string;
+  section: string;
+  question: string;
+  type: string;
+  options?: QuestionOption[];
+  max?: number;
+};
 
 type Answers = Record<string, string | string[]>;
 type ContactData = { name: string; email: string; phone: string };
@@ -99,7 +109,7 @@ function detectProfile(answers: Answers): Profile {
   if (isBusiness && (concernsBusiness || hasHighIncome) && !hasLife) return PROFILES.empresario;
   if (hasDependents && !hasLife && (answers.debts !== "none" || answers.cushion === "critical")) return PROFILES.urgente;
   if ((isMarried || hasDependents) && !hasLife) return PROFILES.familia;
-  if (isYoung && !hasDependents) return PROFILES.constructor;
+  if (isYoung && !hasDependents) return PROFILES.patrimonio;
   return PROFILES.urgente;
 }
 
@@ -403,13 +413,13 @@ export default function DiagnosticoForm() {
               }}
             >
               <option value="">Selecciona tu año de nacimiento</option>
-              {q.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {q.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           )}
 
           {q.type === "single" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {q.options.map(o => (
+              {q.options?.map(o => (
                 <button key={o.value} onClick={() => handleAnswer(q.id, o.value, "single")} style={S.btn(answers[q.id] === o.value)}>
                   {o.icon && <span style={{ fontSize: "16px" }}>{o.icon}</span>}
                   <span style={{ flex: 1 }}>{o.label}</span>
@@ -426,7 +436,7 @@ export default function DiagnosticoForm() {
                   Selecciona hasta {q.max}
                 </div>
               )}
-              {q.options.map(o => {
+              {q.options?.map(o => {
                 const sel = ((answers[q.id] as string[]) || []).includes(o.value);
                 return (
                   <button key={o.value} onClick={() => handleAnswer(q.id, o.value, "multi", "max" in q ? q.max : undefined)} style={S.btn(sel)}>
@@ -441,7 +451,7 @@ export default function DiagnosticoForm() {
 
           {q.type === "scale" && (
             <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
-              {q.options.map(o => (
+              {q.options?.map(o => (
                 <button
                   key={o.value}
                   onClick={() => handleAnswer(q.id, o.value, "single")}

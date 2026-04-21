@@ -64,8 +64,8 @@ export default function AgendaPage() {
               Sistema de citas disponible próximamente
             </p>
             <p style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.6, maxWidth: "300px" }}>
-              Mientras tanto, contáctame directamente por cualquiera de los canales
-              a la derecha para agendar tu sesión.
+              Mientras tanto, contáctame directamente por WhatsApp o correo
+              para agendar tu sesión.
             </p>
           </div>
           <div style={{
@@ -86,7 +86,7 @@ export default function AgendaPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* WhatsApp */}
           <a
-            href="https://wa.me/521XXXXXXXXXX"
+            href="https://wa.me/526861085164"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -116,14 +116,14 @@ export default function AgendaPage() {
                 WhatsApp
               </div>
               <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text)" }}>
-                +52 1 (XXX) XXX-XXXX
+                +52 686 108 5164
               </div>
             </div>
           </a>
 
           {/* Email */}
           <a
-            href="mailto:hola@dedaloproteccion.mx"
+            href="mailto:jose@dedaloproteccion.mx"
             style={{
               display: "flex",
               alignItems: "center",
@@ -135,7 +135,7 @@ export default function AgendaPage() {
               textDecoration: "none",
               transition: "border-color 200ms",
             }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--border-blue)")}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--border-gold)")}
             onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
           >
             <div style={{
@@ -148,10 +148,10 @@ export default function AgendaPage() {
             </div>
             <div>
               <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "3px" }}>
-                Email
+                Correo
               </div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text)" }}>
-                hola@dedaloproteccion.mx
+                jose@dedaloproteccion.mx
               </div>
             </div>
           </a>
@@ -196,9 +196,7 @@ export default function AgendaPage() {
 
       <style>{`
         @media (max-width: 768px) {
-          .agenda-grid {
-            grid-template-columns: 1fr !important;
-          }
+          .agenda-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
