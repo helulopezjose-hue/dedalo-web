@@ -1,0 +1,427 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Configurar variables de entorno y archivo .env.example",
+        "description": "Crear el archivo .env.example con todas las variables necesarias documentadas y configurar el entorno de desarrollo local para las integraciones del proyecto.",
+        "details": "Crear /Users/josehelu/dedalo-web/.env.example con las siguientes variables:\n\n```\n# Make/Integromat webhook para diagnóstico → Notion\nNEXT_PUBLIC_MAKE_WEBHOOK_URL=\n\n# Cal.com (opcional, si se usa embed con token)\nCAL_COM_EMBED_URL=\n\n# Google Analytics\nNEXT_PUBLIC_GA_MEASUREMENT_ID=\n```\n\nAgregar .env.local al .gitignore si no está ya. Verificar que el archivo .gitignore existente incluye .env* (ya está incluido según git status). Documentar cada variable con un comentario descriptivo en el .env.example. NO incluir valores reales nunca en este archivo.",
+        "testStrategy": "Verificar que .env.example existe en el repositorio y que .env.local está en .gitignore. Confirmar que el build de Next.js no falla por variables faltantes — las opcionales deben tener fallback con ?? '' como ya lo hace MAKE_WEBHOOK_URL en DiagnosticoForm.tsx.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-23T21:04:59.645Z"
+      },
+      {
+        "id": "2",
+        "title": "Configurar headers de seguridad en next.config.ts",
+        "description": "Añadir headers HTTP de seguridad en next.config.ts: X-Frame-Options, X-Content-Type-Options, Referrer-Policy y Content-Security-Policy básico.",
+        "details": "Leer el docs actualizado de Next.js 16 para headers. Modificar /Users/josehelu/dedalo-web/next.config.ts:\n\n```typescript\nimport type { NextConfig } from 'next';\n\nconst securityHeaders = [\n  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },\n  { key: 'X-Content-Type-Options', value: 'nosniff' },\n  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },\n  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },\n  {\n    key: 'Content-Security-Policy',\n    value: [\n      \"default-src 'self'\",\n      \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://app.cal.com\",\n      \"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com\",\n      \"font-src 'self' https://fonts.gstatic.com\",\n      \"img-src 'self' data: blob: https:\",\n      \"connect-src 'self' https://hook.us1.make.com https://www.google-analytics.com\",\n      \"frame-src https://app.cal.com https://calendly.com\",\n    ].join('; '),\n  },\n];\n\nconst nextConfig: NextConfig = {\n  async headers() {\n    return [{ source: '/(.*)', headers: securityHeaders }];\n  },\n};\n\nexport default nextConfig;\n```\n\nNota: El CSP debe permitir el dominio del webhook de Make y el embed de Cal.com. Ajustar los dominios según la URL real del webhook.",
+        "testStrategy": "Ejecutar `npm run build && npm run start` y verificar con curl o browser DevTools que los headers de seguridad aparecen en las respuestas HTTP. Usar https://securityheaders.com para validar la configuración una vez en producción.",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:50:47.381Z"
+      },
+      {
+        "id": "3",
+        "title": "Corregir Navbar: estados hover con CSS puro y eliminar event handlers de inline JS",
+        "description": "Refactorizar Navbar.tsx para eliminar los onMouseEnter/onMouseLeave inline en favor de clases CSS, siguiendo el patrón del proyecto (ya corregido en commits anteriores para Server Components). El Navbar es Client Component, pero es buena práctica.",
+        "details": "En /Users/josehelu/dedalo-web/components/layout/Navbar.tsx, los links de navegación usan onMouseEnter/onMouseLeave para cambiar color. Mover estos estilos a CSS dentro del bloque `<style>` del componente usando clases:\n\n```css\n.nav-link { font-size: 14px; font-weight: 500; color: var(--muted); transition: color 200ms; text-decoration: none; }\n.nav-link:hover, .nav-link.active { color: var(--accent-gold); }\n.nav-cta-btn { font-size: 13px; font-weight: 600; color: var(--accent-gold); border: 1px solid var(--border-gold); border-radius: 8px; padding: 8px 18px; transition: all 200ms; text-decoration: none; white-space: nowrap; }\n.nav-cta-btn:hover { background: var(--accent-gold-muted); border-color: var(--accent-gold); }\n```\n\nUsar `className={\\`nav-link${pathname === href ? ' active' : ''}\\`}` en los Links. Eliminar todos los onMouseEnter/onMouseLeave del Navbar. Mantener el menú hamburger existente y el estado `open` con useState.",
+        "testStrategy": "Navegar a cada ruta del sitio y verificar que el link activo aparece en dorado y que los hover funcionan. Probar en móvil (375px) que el menú hamburger abre y cierra correctamente. Verificar que no hay errores de hidratación en la consola del navegador.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:37:20.835Z"
+      },
+      {
+        "id": "4",
+        "title": "Añadir WhatsApp al Footer y completar links de contacto",
+        "description": "El Footer actual no incluye el link de WhatsApp. Agregar enlace a https://wa.me/526861085164 en la sección de Contacto del Footer.",
+        "details": "En /Users/josehelu/dedalo-web/components/layout/Footer.tsx, en la sección 'Contacto' agregar el link de WhatsApp después del email:\n\n```tsx\n<a href=\"https://wa.me/526861085164\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"footer-contact-link\">\n  WhatsApp · +52 686 108 5164\n</a>\n```\n\nAgregar clase CSS `.footer-wa-link` que cambie a color verde (#25D366) en hover para distinguirlo del email. También asegurarse de que el Footer tenga `rel=\"noopener noreferrer\"` en todos los links externos (ya los tiene el de WhatsApp en sobre-mi, replicar el mismo patrón).",
+        "testStrategy": "Verificar que el link de WhatsApp aparece en el footer en todas las páginas. Click en el link y confirmar que abre WhatsApp con el número correcto. Probar en móvil que funciona el deep link wa.me.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:37:22.126Z"
+      },
+      {
+        "id": "5",
+        "title": "Crear página 404 personalizada con branding DÉDALO",
+        "description": "Crear app/not-found.tsx con diseño consistente al resto del sitio, mensaje apropiado y CTA para volver al inicio.",
+        "details": "Crear /Users/josehelu/dedalo-web/app/not-found.tsx (Next.js App Router usa este archivo para 404s automáticamente):\n\n```tsx\nimport type { Metadata } from 'next';\nimport Link from 'next/link';\n\nexport const metadata: Metadata = {\n  title: 'Página no encontrada',\n  description: 'La página que buscas no existe.',\n  robots: { index: false },\n};\n\nexport default function NotFound() {\n  return (\n    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>\n      <div className=\"label-tag\" style={{ marginBottom: '24px' }}>ERROR 404</div>\n      <h1 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 800, color: 'var(--accent-gold)', letterSpacing: '-0.02em', marginBottom: '16px' }}>Laberinto sin salida</h1>\n      <p style={{ fontSize: '17px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '40px' }}>Esta página no existe. Como un seguro sin cláusulas claras — no hay nada aquí.</p>\n      <Link href=\"/\" style={{ display: 'inline-block', background: 'var(--accent-blue)', color: '#fff', borderRadius: '8px', padding: '13px 28px', fontSize: '15px', fontWeight: 600, textDecoration: 'none' }}>Volver al inicio →</Link>\n      <div style={{ marginTop: '24px' }}>\n        <Link href=\"/diagnostico\" style={{ fontSize: '14px', color: 'var(--accent-gold)' }}>O hacer el diagnóstico gratuito</Link>\n      </div>\n    </div>\n  );\n}\n```",
+        "testStrategy": "Navegar a una URL inexistente como /ruta-que-no-existe y verificar que aparece la página 404 con el diseño correcto. Confirmar que el header y footer del RootLayout aparecen. Verificar que los CTAs de la página 404 llevan a las rutas correctas.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:37:23.457Z"
+      },
+      {
+        "id": "6",
+        "title": "Implementar integración Cal.com en página /agenda",
+        "description": "Reemplazar el placeholder de calendario en /agenda con el widget embed funcional de Cal.com, configurado con el horario de José (L-V 9am-9pm hora Tijuana, citas de 30 min).",
+        "details": "Cal.com ofrece un script de embed inline. Crear un Client Component `CalEmbed` en components/CalEmbed.tsx:\n\n```tsx\n'use client';\nimport { useEffect } from 'react';\n\nexport default function CalEmbed({ calLink }: { calLink: string }) {\n  useEffect(() => {\n    const script = document.createElement('script');\n    script.src = 'https://app.cal.com/embed/embed.js';\n    script.async = true;\n    document.head.appendChild(script);\n    return () => { document.head.removeChild(script); };\n  }, []);\n\n  return (\n    <div\n      data-cal-link={calLink}\n      data-cal-config='{\"layout\":\"month_view\"}'\n      style={{ width: '100%', height: '600px', overflow: 'scroll' }}\n    />\n  );\n}\n```\n\nConfiguración en Cal.com (instrucciones para José):\n- Crear cuenta en cal.com con el email jose@dedaloproteccion.mx\n- Crear event type 'Consulta gratuita 30 min'\n- Configurar timezone: America/Tijuana\n- Disponibilidad: Lunes-Viernes 9:00-21:00\n- Activar confirmación automática por email\n- Configurar notificación al host\n- Obtener el cal-link (ej: jose-helu/consulta-gratuita)\n\nUsar el calLink como prop o desde una variable de entorno NEXT_PUBLIC_CAL_LINK. Actualizar agenda/page.tsx para usar `<CalEmbed calLink={process.env.NEXT_PUBLIC_CAL_LINK ?? 'jose-helu/consulta'} />`.\n\nMantener los cards de WhatsApp y email como alternativa de contacto debajo del calendario.",
+        "testStrategy": "Verificar que el widget de Cal.com carga en /agenda sin errores de consola. Comprobar que el calendary muestra los horarios correctos (L-V 9-21h hora Tijuana). Hacer una reserva de prueba y confirmar que llega email de confirmación tanto al visitante como a jose@dedaloproteccion.mx. Verificar que en móvil el embed hace scroll correctamente.",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "7",
+        "title": "Crear sistema de rutas para artículos de blog con MDX",
+        "description": "Implementar el sistema de rutas dinámicas /blog/[slug] para las páginas individuales de artículos, con soporte para contenido en MDX.",
+        "details": "Instalar dependencias necesarias: `npm install @next/mdx @mdx-js/loader @mdx-js/react remark-gfm rehype-highlight`\n\nActualizar next.config.ts para soporte MDX:\n```typescript\nimport createMDX from '@next/mdx';\nconst withMDX = createMDX({ options: { remarkPlugins: [], rehypePlugins: [] } });\nexport default withMDX(nextConfig);\n```\n\nEstructura de archivos:\n```\napp/blog/[slug]/page.tsx   ← página dinámica\ncontent/blog/\n  que-cubre-gmm.mdx\n  seguro-de-vida-calculo.mdx\n  errores-seguro-auto.mdx\n```\n\nCrear tipos TypeScript para los artículos:\n```typescript\n// lib/blog.ts\nexport interface BlogPost {\n  slug: string;\n  title: string;\n  description: string;\n  category: string;\n  date: string;\n  readTime: string;\n  author: string;\n  ogImage?: string;\n}\n```\n\nCrear `app/blog/[slug]/page.tsx` con generateStaticParams para pre-renderizar todos los slugs en build time, y generateMetadata para SEO por artículo.\n\nLa ruta debe:\n1. Leer el archivo MDX desde content/blog/[slug].mdx\n2. Mostrar título, autor, fecha, categoría, tiempo de lectura\n3. Renderizar el contenido MDX\n4. Incluir CTA al diagnóstico al final\n5. Incluir botones de compartir (Twitter/X, WhatsApp, LinkedIn)\n6. Incluir Article schema JSON-LD",
+        "testStrategy": "Ejecutar `npm run build` y verificar que los 3 slugs se generan como páginas estáticas. Navegar a /blog/que-cubre-gmm y confirmar que el contenido MDX renderiza correctamente. Verificar con curl que el HTML incluye los meta tags de SEO. Probar que URLs inexistentes como /blog/no-existe devuelven 404.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:32:51.173Z"
+      },
+      {
+        "id": "8",
+        "title": "Escribir y publicar los 3 artículos de blog con contenido completo",
+        "description": "Crear los 3 archivos MDX con contenido completo (500-1000 palabras cada uno) para los artículos requeridos en el PRD.",
+        "details": "Crear los siguientes archivos MDX en /Users/josehelu/dedalo-web/content/blog/:\n\n**1. que-cubre-gmm.mdx** (categoría: GMM)\nFrontmatter:\n```yaml\n---\ntitle: '¿Qué cubre realmente un seguro de Gastos Médicos Mayores?'\ndescription: 'La diferencia entre una póliza básica y una completa puede significar cientos de miles de pesos en el momento más crítico.'\ncategory: 'GMM'\ncategoryColor: 'var(--accent-blue)'\ndate: '2025-04-10'\nreadTime: '5 min'\nauthor: 'José G. Helú'\nslug: 'que-cubre-gmm'\n---\n```\nContenido: Explicar deducible, coaseguro, suma asegurada, red médica, enfermedades preexistentes, periodo de espera, comparación con IMSS/ISSSTE. Incluir tabla comparativa, 3-4 puntos clave a revisar al contratar.\n\n**2. seguro-de-vida-calculo.mdx** (categoría: Vida)\nFrontmatter similar con sus datos.\nContenido: Por qué el 80% está subprotegido, método DIME (Deuda, Ingreso, Manutención, Educación) para calcular suma asegurada, tipos de seguro de vida (temporal vs permanente), cuándo contratar.\n\n**3. errores-seguro-auto.mdx** (categoría: Auto)\nContenido: Los 5 errores: elegir deducible más bajo, ignorar RC, no declarar uso comercial, no revisar la exclusiones, renovar sin comparar. Formato de lista numerada con descripción de cada error y cómo evitarlo.\n\nCada artículo debe terminar con un bloque MDX de CTA:\n```mdx\n## ¿Quieres saber si tu protección actual es suficiente?\n[Hacer el diagnóstico gratuito →](/diagnostico)\n```",
+        "testStrategy": "Navegar a cada URL de artículo y verificar que el contenido se muestra completo y con formato correcto. Contar las palabras de cada artículo para confirmar 500+ palabras. Verificar que los links internos dentro del contenido funcionan. Revisar que el frontmatter se renderiza correctamente en título, fecha, categoría, etc.",
+        "priority": "high",
+        "dependencies": [
+          "7"
+        ],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:34:14.020Z"
+      },
+      {
+        "id": "9",
+        "title": "Implementar filtrado por categoría en la página de listado del blog",
+        "description": "Añadir funcionalidad de filtrado por categoría (Vida, GMM, Auto, Hogar, Educación) en la página /blog usando URL search params para mantener el estado compartible.",
+        "details": "Actualizar /Users/josehelu/dedalo-web/app/blog/page.tsx para:\n\n1. Leer los posts desde el sistema de archivos (content/blog/*.mdx) en lugar de un array hardcodeado, usando fs y gray-matter o el frontmatter de MDX.\n\n2. Implementar filtrado con URL search params (no useState, para SSR y URLs compartibles):\n```tsx\n// app/blog/page.tsx (Server Component)\nimport { getAllPosts } from '@/lib/blog';\n\nexport default async function BlogPage({ searchParams }: { searchParams: { categoria?: string } }) {\n  const allPosts = await getAllPosts();\n  const categoria = searchParams.categoria;\n  const filtered = categoria ? allPosts.filter(p => p.category.toLowerCase() === categoria.toLowerCase()) : allPosts;\n  // ...\n}\n```\n\n3. Crear un Client Component `CategoryFilter` para los botones de categoría que usen `useRouter` para actualizar el search param:\n```tsx\n'use client';\nimport { useRouter, useSearchParams } from 'next/navigation';\n\nconst categories = ['Todos', 'Vida', 'GMM', 'Auto', 'Hogar', 'Educación'];\n\nexport function CategoryFilter({ active }: { active?: string }) {\n  const router = useRouter();\n  return (\n    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px' }}>\n      {categories.map(cat => (\n        <button key={cat}\n          onClick={() => router.push(cat === 'Todos' ? '/blog' : `/blog?categoria=${cat}`)}\n          style={{ /* estilos consistentes con el sitio */ }}\n        >{cat}</button>\n      ))}\n    </div>\n  );\n}\n```\n\n4. Hacer que las tarjetas de blog sean clickeables y lleven a /blog/[slug].\n5. Instalar `gray-matter` para parsear frontmatter: `npm install gray-matter`.",
+        "testStrategy": "Verificar que /blog muestra los 3 artículos. Hacer click en categoría 'GMM' y confirmar que solo aparece el artículo de GMM. Verificar que la URL cambia a /blog?categoria=GMM. Refrescar la página con filtro activo y confirmar que el filtro persiste. Hacer click en 'Todos' y confirmar que vuelven a aparecer todos los artículos.",
+        "priority": "medium",
+        "dependencies": [
+          "7",
+          "8"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "10",
+        "title": "Implementar SEO completo: sitemap.xml y robots.txt con Next.js App Router",
+        "description": "Generar sitemap.xml dinámico y robots.txt usando las APIs de Next.js 16 App Router para optimizar el indexado de todas las páginas del sitio.",
+        "details": "En Next.js 16 App Router, sitemap y robots se generan con archivos especiales.\n\n**Crear app/sitemap.ts:**\n```typescript\nimport { MetadataRoute } from 'next';\nimport { getAllPosts } from '@/lib/blog';\n\nexport default async function sitemap(): Promise<MetadataRoute.Sitemap> {\n  const baseUrl = 'https://dedaloproteccion.mx';\n  const posts = await getAllPosts();\n  \n  const staticPages = [\n    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },\n    { url: `${baseUrl}/diagnostico`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },\n    { url: `${baseUrl}/agenda`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },\n    { url: `${baseUrl}/sobre-mi`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },\n    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },\n  ];\n  \n  const blogPages = posts.map(post => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const,\n    priority: 0.6,\n  }));\n  \n  return [...staticPages, ...blogPages];\n}\n```\n\n**Crear app/robots.ts:**\n```typescript\nimport { MetadataRoute } from 'next';\n\nexport default function robots(): MetadataRoute.Robots {\n  return {\n    rules: { userAgent: '*', allow: '/', disallow: '/api/' },\n    sitemap: 'https://dedaloproteccion.mx/sitemap.xml',\n  };\n}\n```\n\n**Actualizar metadata en cada página** con keywords optimizadas:\n- Home: 'asesor de seguros México, seguros personalizados, seguro de vida México'\n- Diagnóstico: 'diagnóstico de seguros gratuito, evaluación cobertura seguros'\n- Blog: 'blog seguros México, gastos médicos mayores, seguro de vida'\n- Sobre mí: 'asesor seguros Baja California, José Helú asesor'\n- Agenda: 'agendar consulta seguros, consulta gratuita asesor seguros'",
+        "testStrategy": "Ejecutar `npm run build` y acceder a /sitemap.xml y /robots.txt en el servidor local. Verificar que el sitemap incluye todas las páginas estáticas y los 3 artículos de blog. Pegar el sitemap.xml en el validador de Google Search Console. Verificar que robots.txt tiene el formato correcto.",
+        "priority": "high",
+        "dependencies": [
+          "7",
+          "8"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "11",
+        "title": "Agregar og:image y meta tags completos por página",
+        "description": "Crear og:images únicas para cada página (mínimo 1200x630px) y completar todos los meta tags open graph y Twitter Card en cada ruta.",
+        "details": "Next.js 16 App Router permite generar og:images dinámicamente con app/opengraph-image.tsx o con la API de metadata estática.\n\n**Opción 1 (estática, más rápida):** Crear imágenes OG en /public/og/ y referenciarlas en metadata.\n\n**Opción 2 (dinámica, recomendada):** Usar next/og para generar imágenes con el branding DÉDALO.\n\nCrear /Users/josehelu/dedalo-web/app/opengraph-image.tsx (imagen OG global):\n```tsx\nimport { ImageResponse } from 'next/og';\nexport const runtime = 'edge';\nexport const size = { width: 1200, height: 630 };\nexport const contentType = 'image/png';\n\nexport default function Image() {\n  return new ImageResponse(\n    <div style={{ background: '#060C1A', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px' }}>\n      <div style={{ fontSize: 72, fontWeight: 800, color: '#C9A84C', marginBottom: 24 }}>DÉDALO</div>\n      <div style={{ fontSize: 28, color: '#8892A4', textAlign: 'center' }}>Arquitectura de Protección</div>\n      <div style={{ fontSize: 20, color: '#F0EDE8', marginTop: 32, maxWidth: 800, textAlign: 'center' }}>Asesoría de seguros personalizada en México</div>\n    </div>,\n    { ...size }\n  );\n}\n```\n\nCrear imágenes OG específicas para /diagnostico, /agenda, /sobre-mi, /blog y cada artículo de blog (usando generateImageMetadata o archivos opengraph-image.tsx en cada carpeta de ruta).\n\nActualizar el metadata global en app/layout.tsx para incluir:\n```typescript\nopenGraph: {\n  siteName: 'DÉDALO · Arquitectura de Protección',\n  locale: 'es_MX',\n  type: 'website',\n  images: [{ url: '/og-image.png', width: 1200, height: 630 }],\n},\ntwitter: { card: 'summary_large_image' },\n```",
+        "testStrategy": "Usar https://opengraph.xyz o el debugger de Facebook/LinkedIn para verificar que las og:images se generan correctamente para cada URL. Verificar que las imágenes tienen exactamente 1200x630px. Confirmar que el title y description de OG son únicos por página.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:48:57.961Z"
+      },
+      {
+        "id": "12",
+        "title": "Implementar Structured Data (JSON-LD) para SEO",
+        "description": "Agregar schema.org JSON-LD en las páginas clave: LocalBusiness en home, Article en artículos de blog, Person en sobre-mi, y FAQ/Service donde aplique.",
+        "details": "Crear un componente reutilizable para inyectar JSON-LD.\n\nCrear /Users/josehelu/dedalo-web/components/JsonLd.tsx:\n```tsx\nexport function JsonLd({ data }: { data: Record<string, unknown> }) {\n  return (\n    <script\n      type=\"application/ld+json\"\n      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}\n    />\n  );\n}\n```\n\nEn app/page.tsx (Home), agregar en el return:\n```tsx\n<JsonLd data={{\n  '@context': 'https://schema.org',\n  '@type': 'ProfessionalService',\n  name: 'DÉDALO · Arquitectura de Protección',\n  description: 'Asesoría de seguros personalizada en México',\n  url: 'https://dedaloproteccion.mx',\n  telephone: '+526861085164',\n  email: 'jose@dedaloproteccion.mx',\n  areaServed: 'MX',\n  priceRange: 'Consulta gratuita',\n  sameAs: [],\n}} />\n```\n\nEn app/sobre-mi/page.tsx, agregar schema Person:\n```json\n{\n  '@type': 'Person',\n  name: 'José G. Helú',\n  jobTitle: 'Asesor de Seguros',\n  worksFor: { '@type': 'Organization', name: 'AXA México' },\n  url: 'https://dedaloproteccion.mx/sobre-mi'\n}\n```\n\nEn app/blog/[slug]/page.tsx, agregar schema Article con author, datePublished, headline.",
+        "testStrategy": "Pegar las URLs en https://search.google.com/test/rich-results para validar el structured data. Verificar que no hay errores de validación de schema. Confirmar que el JSON-LD aparece en el HTML fuente de cada página.",
+        "priority": "medium",
+        "dependencies": [
+          "10"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "13",
+        "title": "Integrar Google Analytics 4 con App Router de Next.js",
+        "description": "Implementar Google Analytics 4 usando el Measurement ID desde variables de entorno, con carga diferida para no impactar Core Web Vitals.",
+        "details": "Usar next/script para cargar GA4 de manera óptima sin impactar el LCP.\n\nCrear /Users/josehelu/dedalo-web/components/GoogleAnalytics.tsx:\n```tsx\nimport Script from 'next/script';\n\nexport function GoogleAnalytics({ measurementId }: { measurementId: string }) {\n  if (!measurementId) return null;\n  return (\n    <>\n      <Script\n        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}\n        strategy=\"afterInteractive\"\n      />\n      <Script id=\"google-analytics\" strategy=\"afterInteractive\">\n        {`\n          window.dataLayer = window.dataLayer || [];\n          function gtag(){dataLayer.push(arguments);}\n          gtag('js', new Date());\n          gtag('config', '${measurementId}', { page_path: window.location.pathname });\n        `}\n      </Script>\n    </>\n  );\n}\n```\n\nAgregar en app/layout.tsx dentro del `<body>`:\n```tsx\n<GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />\n```\n\nAdicional: Crear un helper para trackear eventos custom de conversión:\n```typescript\n// lib/analytics.ts\nexport function trackEvent(name: string, params?: Record<string, unknown>) {\n  if (typeof window !== 'undefined' && window.gtag) {\n    window.gtag('event', name, params);\n  }\n}\n```\n\nUsar `trackEvent('diagnostico_completado', { perfil: scoreResult.profile.id })` en DiagnosticoForm.tsx al completar el diagnóstico.",
+        "testStrategy": "Agregar el Measurement ID en .env.local y verificar en GA4 Real-Time que llegan pageviews al navegar por el sitio. Confirmar con DevTools Network que el script de GA se carga con strategy='afterInteractive'. Verificar que el evento 'diagnostico_completado' aparece en GA4 al completar el formulario.",
+        "priority": "medium",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "14",
+        "title": "Optimizar imágenes con next/image y preparar estructura de assets",
+        "description": "Configurar next/image para todas las imágenes del sitio, crear la carpeta /public/images con placeholders y establecer el patrón de uso correcto.",
+        "details": "El proyecto actualmente no usa imágenes reales (solo placeholders con CSS). Preparar la infraestructura para cuando lleguen las imágenes reales.\n\n1. Crear estructura de directorios:\n```\npublic/\n  images/\n    jose-helu.jpg (placeholder: imagen profesional de José)\n    og/\n      home.png\n      diagnostico.png\n      blog.png\n      sobre-mi.png\n      agenda.png\n    blog/\n      que-cubre-gmm.jpg\n      seguro-de-vida-calculo.jpg\n      errores-seguro-auto.jpg\n```\n\n2. En sobre-mi/page.tsx, reemplazar el div placeholder con:\n```tsx\nimport Image from 'next/image';\n// ...\n{/* Cuando llegue la foto real: */}\n{/* <Image src=\"/images/jose-helu.jpg\" alt=\"José G. Helú - Asesor de Seguros DÉDALO\" width={280} height={280} style={{ borderRadius: '16px' }} priority /> */}\n```\n\n3. En blog/[slug]/page.tsx, usar next/image para las imágenes de portada de artículos.\n\n4. Actualizar next.config.ts para configurar domains permitidos si hay imágenes externas:\n```typescript\nimages: {\n  domains: [],\n  formats: ['image/avif', 'image/webp'],\n}\n```\n\n5. Agregar `font-display: swap` implícito en la importación de Google Fonts — ya está via la URL de Google Fonts que Next.js optimiza automáticamente con next/font. Migrar la importación de `globals.css` a `next/font/google` en layout.tsx para optimización automática.",
+        "testStrategy": "Ejecutar `npm run build` y verificar que no hay warnings sobre imágenes sin width/height. Usar Lighthouse para confirmar que no hay imágenes que bloqueen el LCP. Verificar que el formato AVIF/WebP se sirve cuando el navegador lo soporta.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "15",
+        "title": "Migrar fuente Inter a next/font para optimización automática",
+        "description": "Reemplazar la importación de Google Fonts en globals.css con next/font/google para eliminar el request externo y mejorar CLS y LCP.",
+        "details": "Actualmente globals.css importa Inter desde Google Fonts con `@import url(...)`, lo que hace una request externa en cada carga. Next.js tiene next/font que descarga las fuentes en build time y las sirve self-hosted.\n\nModificar app/layout.tsx:\n```tsx\nimport { Inter } from 'next/font/google';\n\nconst inter = Inter({\n  subsets: ['latin'],\n  weight: ['400', '500', '600', '700', '800'],\n  display: 'swap',\n  variable: '--font-inter',\n});\n\nexport default function RootLayout({ children }: { children: React.ReactNode }) {\n  return (\n    <html lang=\"es\" className={inter.variable}>\n      <body className={inter.className}>\n        ...\n      </body>\n    </html>\n  );\n}\n```\n\nRemover la línea `@import url('https://fonts.googleapis.com/...')` de globals.css.\n\nVerificar que el `font-family: 'Inter', sans-serif` en el body de globals.css todavía funciona (lo hará porque la clase del body ya aplica la fuente), o actualizar a `font-family: var(--font-inter), sans-serif`.",
+        "testStrategy": "Ejecutar `npm run build` y verificar en el output de red del navegador que NO hay requests a fonts.googleapis.com ni fonts.gstatic.com. Usar Lighthouse y confirmar que no hay warnings de 'Eliminate render-blocking resources' relacionados con fuentes. Verificar visualmente que la tipografía sigue siendo Inter en todas las páginas.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "16",
+        "title": "Completar responsividad: Home, Blog y páginas restantes a 375px y 768px",
+        "description": "Auditar y corregir el diseño responsive en todas las páginas, asegurando que se vean correctamente en móvil (375px), tablet (768px) y desktop (1440px).",
+        "details": "El sitio tiene responsive básico en algunas páginas. Auditar cada una:\n\n**Home (app/page.tsx):**\n- El grid de servicios ya usa `repeat(auto-fit, minmax(220px, 1fr))` — OK\n- Los CTAs del hero con flexWrap — OK\n- Los steps grid tiene media query en el <style> tag — OK\n- Revisar que el Hero padding no quede demasiado pequeño en 375px\n\n**Blog (app/blog/page.tsx):**\n- El grid de 2 columnas ya tiene media query a 1 columna en 640px — OK\n- Asegurar que las tarjetas tengan min-height correcto en móvil\n\n**Agenda (app/agenda/page.tsx):**\n- El grid `1fr 360px` tiene media query a `1fr` en 768px — OK\n- Cuando se integre Cal.com, verificar que el embed hace scroll en móvil\n\n**Sobre mí (app/sobre-mi/page.tsx):**\n- El grid `1fr 360px` tiene media query — OK\n- La foto placeholder queda bien en móvil\n\n**Diagnóstico (DiagnosticoForm.tsx):**\n- El maxWidth de 600px con padding 24px funciona en todos los tamaños\n- Los botones de escala (1-5) usan flexWrap — OK\n\n**Navbar:**\n- Implementar mejoras de tarea 3 primero\n\n**Acción principal:** Agregar `<meta name='viewport' content='width=device-width, initial-scale=1'>` si no está en layout.tsx (Next.js lo incluye automáticamente). Probar con DevTools en Chrome a 375px, 768px y 1440px cada página y documentar issues encontrados.",
+        "testStrategy": "Usar Chrome DevTools con viewports de 375px, 768px y 1440px para cada página. Verificar que no hay scroll horizontal en ningún viewport. Usar Lighthouse para el test de Mobile. Verificar que todos los textos tienen tamaño mínimo de 14px en móvil para legibilidad.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:46:50.899Z"
+      },
+      {
+        "id": "17",
+        "title": "Agregar estados de loading (skeleton) al diagnóstico durante envío del webhook",
+        "description": "Mejorar el estado de loading en DiagnosticoForm.tsx durante el envío del webhook a Make, y agregar manejo de error con mensaje claro al usuario.",
+        "details": "Actualmente el `enviarAMake` se llama en `startAnalysis()` sin feedback explícito al usuario sobre si fue exitoso o falló. La pantalla de análisis ya muestra un spinner, pero no comunica el resultado del envío.\n\nModificar DiagnosticoForm.tsx para agregar:\n1. Estado de envío del webhook:\n```typescript\nconst [webhookStatus, setWebhookStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');\n```\n\n2. En la pantalla de resultado (step === 'result'), agregar un pequeño indicador debajo del CTA:\n```tsx\n{webhookStatus === 'success' && (\n  <div style={{ fontSize: '12px', color: 'var(--success)', textAlign: 'center', marginTop: '8px' }}>\n    ✓ Tu diagnóstico fue enviado a tu correo\n  </div>\n)}\n{webhookStatus === 'error' && (\n  <div style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center', marginTop: '8px' }}>\n    No pudimos enviar el reporte por correo, pero puedes agendar tu cita de todas formas.\n  </div>\n)}\n```\n\n3. Actualizar `startAnalysis()` para actualizar el estado:\n```typescript\nconst ok = await enviarAMake(answers, contactData, scoreResult);\nsetWebhookStatus(ok ? 'success' : 'error');\n```\n\n4. La pantalla de análisis ya tiene un spinner visual adecuado — mantenerla.",
+        "testStrategy": "Completar el diagnóstico con y sin NEXT_PUBLIC_MAKE_WEBHOOK_URL configurada. Sin URL, verificar que el estado queda en 'error' y se muestra el mensaje apropiado. Con URL real, verificar que llega el webhook a Make y que el estado pasa a 'success'. Confirmar que el flujo completo de resultado funciona independientemente del estado del webhook.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "18",
+        "title": "Implementar botones para compartir en redes sociales en artículos de blog",
+        "description": "Agregar botones de compartir en Twitter/X, WhatsApp y LinkedIn al final de cada página de artículo individual (/blog/[slug]).",
+        "details": "Crear un Client Component para los botones de compartir:\n\nCrear /Users/josehelu/dedalo-web/components/ShareButtons.tsx:\n```tsx\n'use client';\n\ninterface ShareButtonsProps {\n  title: string;\n  url: string;\n}\n\nexport function ShareButtons({ title, url }: ShareButtonsProps) {\n  const encodedUrl = encodeURIComponent(url);\n  const encodedTitle = encodeURIComponent(title);\n  \n  const shares = [\n    {\n      label: 'Twitter / X',\n      href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,\n      color: '#1DA1F2',\n    },\n    {\n      label: 'WhatsApp',\n      href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,\n      color: '#25D366',\n    },\n    {\n      label: 'LinkedIn',\n      href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,\n      color: '#0077B5',\n    },\n  ];\n  \n  return (\n    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '32px' }}>\n      <span style={{ fontSize: '12px', color: 'var(--muted)', alignSelf: 'center' }}>Compartir:</span>\n      {shares.map(({ label, href, color }) => (\n        <a key={label} href={href} target=\"_blank\" rel=\"noopener noreferrer\"\n          style={{ fontSize: '13px', fontWeight: 600, color, border: `1px solid ${color}40`, borderRadius: '6px', padding: '6px 14px', textDecoration: 'none', transition: 'background 200ms' }}\n        >{label}</a>\n      ))}\n    </div>\n  );\n}\n```\n\nUsar en app/blog/[slug]/page.tsx después del contenido MDX y antes del CTA:\n```tsx\n<ShareButtons title={post.title} url={`https://dedaloproteccion.mx/blog/${slug}`} />\n```",
+        "testStrategy": "Navegar a un artículo de blog y hacer click en cada botón de compartir. Verificar que se abre la red social correspondiente con el título y URL correctos pre-rellenados. Verificar en móvil que el botón de WhatsApp abre la app de WhatsApp. Confirmar que los links usan target='_blank' con rel='noopener noreferrer'.",
+        "priority": "medium",
+        "dependencies": [
+          "7"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "19",
+        "title": "Agregar CTA de diagnóstico al final de cada artículo de blog",
+        "description": "Implementar un componente CTA reutilizable que aparezca al final de cada artículo de blog animando al lector a hacer el diagnóstico gratuito.",
+        "details": "Crear /Users/josehelu/dedalo-web/components/BlogCTA.tsx:\n```tsx\nimport Link from 'next/link';\n\nexport function BlogCTA() {\n  return (\n    <div style={{\n      background: 'var(--surface)',\n      border: '1px solid var(--border-gold)',\n      borderRadius: '16px',\n      padding: '32px 28px',\n      marginTop: '48px',\n      textAlign: 'center',\n    }}>\n      <div className=\"label-tag\" style={{ marginBottom: '12px' }}>DIAGNÓSTICO GRATUITO</div>\n      <h3 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text)', marginBottom: '12px', letterSpacing: '-0.01em' }}>\n        ¿Sabes qué tan protegido/a estás realmente?\n      </h3>\n      <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '24px', maxWidth: '400px', margin: '0 auto 24px' }}>\n        15 preguntas. Resultado inmediato. Sin costo. Descubre tus brechas de protección.\n      </p>\n      <Link href=\"/diagnostico\" style={{\n        display: 'inline-block',\n        background: 'var(--accent-blue)',\n        color: '#fff',\n        borderRadius: '8px',\n        padding: '13px 28px',\n        fontSize: '15px',\n        fontWeight: 600,\n        textDecoration: 'none',\n      }}>\n        Hacer mi diagnóstico gratuito →\n      </Link>\n    </div>\n  );\n}\n```\n\nIncorporar en la plantilla de artículo en app/blog/[slug]/page.tsx después del contenido MDX y los botones de compartir.",
+        "testStrategy": "Verificar que el componente BlogCTA aparece al final de los 3 artículos existentes. Confirmar que el CTA link lleva a /diagnostico. Verificar que el diseño es consistente con el resto del sitio (colores, tipografía). Probar en móvil que el CTA se ve correctamente.",
+        "priority": "medium",
+        "dependencies": [
+          "7"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "20",
+        "title": "Optimizar Core Web Vitals: LCP, FID/INP y CLS",
+        "description": "Auditar y optimizar los Core Web Vitals del sitio para cumplir con los objetivos del PRD: LCP <2.5s, FID <100ms, CLS <0.1.",
+        "details": "Ejecutar Lighthouse en modo producción para cada página principal y anotar los valores actuales de LCP, FID/INP y CLS.\n\n**Optimizaciones para LCP (Largest Contentful Paint):**\n1. Asegurar que la fuente Inter está self-hosted (tarea 15) elimina request externa que bloquea render.\n2. El Hero de home tiene texto como LCP, no imagen — esto es óptimo.\n3. Verificar que las páginas de blog con imágenes usen `priority` prop en next/image para el LCP.\n4. Preconectar a dominios de terceros necesarios:\n```tsx\n// En app/layout.tsx <head>:\n<link rel=\"preconnect\" href=\"https://app.cal.com\" />\n```\n\n**Optimizaciones para CLS (Cumulative Layout Shift):**\n1. Asegurar que todas las imágenes tienen width y height definidos.\n2. El Cal.com embed debe tener altura fija para evitar CLS al cargar.\n3. Los skeleton loaders al cargar datos dinámicos.\n\n**Optimizaciones para INP (Interaction to Next Paint):**\n1. El DiagnosticoForm es un componente grande — dividir en lazy-loaded chunks usando `React.lazy` o `dynamic()` de Next.js:\n```typescript\nimport dynamic from 'next/dynamic';\nconst DiagnosticoForm = dynamic(() => import('@/components/DiagnosticoForm'), { ssr: false });\n```\n2. Los event handlers en el quiz ya son simples setState, no hay cálculos pesados en el thread principal.\n\n**Bundle analysis:** Ejecutar `ANALYZE=true npm run build` con `@next/bundle-analyzer` para identificar dependencias grandes.",
+        "testStrategy": "Ejecutar `npm run build && npm run start` y usar Lighthouse en Chrome DevTools con throttling de red 4G para medir Core Web Vitals. Verificar que LCP < 2.5s, CLS < 0.1 en todas las páginas principales. Usar PageSpeed Insights (web.dev/measure) con la URL de producción una vez desplegado.",
+        "priority": "high",
+        "dependencies": [
+          "14",
+          "15"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "21",
+        "title": "Eliminar console.logs y código de debug del proyecto",
+        "description": "Auditar todo el código fuente para eliminar console.log, console.error innecesarios y cualquier código de debugging antes del deploy a producción.",
+        "details": "Ejecutar búsqueda en todos los archivos del proyecto:\n\n```bash\ngrep -r 'console.log\\|console.error\\|console.warn\\|debugger' app/ components/ lib/ --include='*.tsx' --include='*.ts'\n```\n\nRevisar cada resultado:\n- Eliminar console.log de desarrollo\n- Mantener console.error solo si es manejo de errores crítico (aunque en producción es mejor usar un servicio de logging)\n- Eliminar cualquier código comentado que sea innecesario\n\nConfigurar Next.js para eliminar console.log automáticamente en producción en next.config.ts:\n```typescript\ncompiler: {\n  removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,\n}\n```\n\nRevisar también:\n- Variables no usadas que podrían generar warnings de TypeScript\n- Imports no utilizados\n- Código muerto o rutas de lógica inalcanzables\n\nEjecutar `npm run build` y verificar que no hay warnings de TypeScript ni ESLint.",
+        "testStrategy": "Ejecutar el script de grep para confirmar que no quedan console.log en el código. Ejecutar `npm run build` y confirmar build exitoso sin warnings. Abrir DevTools en producción y verificar que la consola está limpia al navegar por el sitio.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "22",
+        "title": "Configurar variables de entorno en Vercel para producción",
+        "description": "Documentar el proceso de configuración de todas las variables de entorno en el dashboard de Vercel para el entorno de producción.",
+        "details": "En el dashboard de Vercel (vercel.com), ir a Settings → Environment Variables y configurar:\n\n**Variables de producción:**\n1. `NEXT_PUBLIC_MAKE_WEBHOOK_URL` = URL del webhook de Make (obtener de Make.com al crear el escenario)\n2. `NEXT_PUBLIC_GA_MEASUREMENT_ID` = ID de Google Analytics 4 (ej: G-XXXXXXXXXX)\n3. `NEXT_PUBLIC_CAL_LINK` = Link de Cal.com (ej: jose-helu/consulta-gratuita)\n\n**Configuración del dominio:**\n1. En Vercel → Domains, agregar dedaloproteccion.mx\n2. Configurar los DNS records en el registrador del dominio:\n   - A record: @ → 76.76.21.21\n   - CNAME: www → cname.vercel-dns.com\n3. Vercel gestiona HTTPS automáticamente via Let's Encrypt\n\n**Verificación post-deploy:**\n1. Confirmar que NEXT_PUBLIC_MAKE_WEBHOOK_URL funciona enviando un diagnóstico de prueba\n2. Verificar que GA4 recibe eventos\n3. Confirmar que Cal.com embed carga correctamente\n\nNota: Las variables NEXT_PUBLIC_* se incluyen en el bundle del cliente — nunca poner tokens secretos con este prefijo.",
+        "testStrategy": "Después de configurar las variables en Vercel, hacer un nuevo deployment y verificar en los logs de Vercel que el build es exitoso. Acceder al sitio en producción y completar el flujo completo: diagnóstico → webhook → resultado → agendar cita. Verificar en Make.com que llegan los datos del diagnóstico.",
+        "priority": "high",
+        "dependencies": [
+          "1",
+          "6",
+          "13"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "23",
+        "title": "Implementar Make/Integromat webhook y escenario para crear leads en Notion",
+        "description": "Crear el escenario en Make.com que recibe los datos del diagnóstico vía webhook POST y crea un registro en la base de datos de Notion con todos los campos requeridos.",
+        "details": "El código del webhook ya está implementado en DiagnosticoForm.tsx (función enviarAMake). El payload incluye todos los campos requeridos por el PRD.\n\n**Pasos en Make.com:**\n1. Crear nuevo escenario\n2. Agregar módulo 'Webhooks → Custom webhook'\n3. Copiar la URL del webhook y guardarla como NEXT_PUBLIC_MAKE_WEBHOOK_URL\n4. Hacer una prueba con el diagnóstico del sitio para capturar la estructura del payload\n5. Agregar módulo 'Notion → Create a Database Item'\n6. Configurar la base de datos de Notion (crear si no existe) con estas propiedades:\n   - Nombre (title)\n   - Email\n   - WhatsApp\n   - Score Diagnóstico (number)\n   - Nivel de Protección (select)\n   - Perfil DÉDALO (select: urgente, patrimonio, familia, empresario)\n   - Temperatura (select: Caliente, Tibio+)\n   - Prioridad (select: Alta, Media, Baja)\n   - Producto Prioritario (select: Vida, GMM, Auto, Hogar)\n   - Edad\n   - Estado Civil\n   - Dependientes\n   - Ocupación\n   - Ingreso\n   - Seguros Actuales\n   - Brechas\n   - Fecha Diagnóstico\n   - Etapa (select: NUEVO, CONTACTADO, EN_PROCESO, CERRADO)\n7. Mapear cada campo del webhook al campo correspondiente en Notion\n8. Activar el escenario\n\n**Estructura del payload** (ya definida en enviarAMake en DiagnosticoForm.tsx): Ver el objeto `payload` en la función.",
+        "testStrategy": "Completar un diagnóstico de prueba en el sitio con datos ficticios. Verificar en Make.com que el escenario se ejecutó exitosamente. Confirmar en la base de datos de Notion que se creó el registro con todos los campos correctamente mapeados. Probar el error handling completando el diagnóstico sin NEXT_PUBLIC_MAKE_WEBHOOK_URL configurada.",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "24",
+        "title": "Crear lib/blog.ts para centralizar la lógica de obtención de posts",
+        "description": "Refactorizar la lógica de posts del blog en un módulo centralizado que lee los archivos MDX desde el sistema de archivos, usado tanto por el listado como por las rutas individuales.",
+        "details": "Crear /Users/josehelu/dedalo-web/lib/blog.ts:\n\n```typescript\nimport fs from 'fs';\nimport path from 'path';\nimport matter from 'gray-matter';\n\nexport interface BlogPost {\n  slug: string;\n  title: string;\n  description: string;\n  category: string;\n  categoryColor: string;\n  date: string;\n  readTime: string;\n  author: string;\n  excerpt?: string;\n  content: string;\n}\n\nconst CONTENT_DIR = path.join(process.cwd(), 'content/blog');\n\nexport async function getAllPosts(): Promise<BlogPost[]> {\n  const files = fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.mdx'));\n  const posts = files.map(filename => {\n    const slug = filename.replace('.mdx', '');\n    const fileContent = fs.readFileSync(path.join(CONTENT_DIR, filename), 'utf8');\n    const { data, content } = matter(fileContent);\n    return { slug, content, ...data } as BlogPost;\n  });\n  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());\n}\n\nexport async function getPostBySlug(slug: string): Promise<BlogPost | null> {\n  const filePath = path.join(CONTENT_DIR, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n  const fileContent = fs.readFileSync(filePath, 'utf8');\n  const { data, content } = matter(fileContent);\n  return { slug, content, ...data } as BlogPost;\n}\n\nexport async function getAllSlugs(): Promise<string[]> {\n  const files = fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.mdx'));\n  return files.map(f => f.replace('.mdx', ''));\n}\n```\n\nInstalar gray-matter si no está: `npm install gray-matter @types/gray-matter`\n\nUsar esta función en:\n- app/blog/page.tsx para el listado\n- app/blog/[slug]/page.tsx para generateStaticParams y la página individual\n- app/sitemap.ts para incluir los posts en el sitemap",
+        "testStrategy": "Crear un test manual ejecutando `node -e \"require('./lib/blog').getAllPosts().then(console.log)\"` para verificar que se leen los posts correctamente. Ejecutar `npm run build` y confirmar que las páginas de blog se generan estáticamente sin errores. Verificar que los posts aparecen ordenados por fecha descendente.",
+        "priority": "high",
+        "dependencies": [
+          "7"
+        ],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-24T21:32:52.457Z"
+      },
+      {
+        "id": "25",
+        "title": "Implementar página individual de artículo /blog/[slug] con layout completo",
+        "description": "Crear la página dinámica app/blog/[slug]/page.tsx con el layout editorial completo: cabecera del artículo, contenido MDX renderizado, botones de compartir y CTA de diagnóstico.",
+        "details": "Crear /Users/josehelu/dedalo-web/app/blog/[slug]/page.tsx:\n\n```tsx\nimport { notFound } from 'next/navigation';\nimport type { Metadata } from 'next';\nimport { getAllSlugs, getPostBySlug } from '@/lib/blog';\nimport { ShareButtons } from '@/components/ShareButtons';\nimport { BlogCTA } from '@/components/BlogCTA';\nimport { JsonLd } from '@/components/JsonLd';\n\nexport async function generateStaticParams() {\n  const slugs = await getAllSlugs();\n  return slugs.map(slug => ({ slug }));\n}\n\nexport async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {\n  const post = await getPostBySlug(params.slug);\n  if (!post) return {};\n  return {\n    title: post.title,\n    description: post.description,\n    openGraph: {\n      title: post.title,\n      description: post.description,\n      type: 'article',\n      publishedTime: post.date,\n      authors: [post.author],\n    },\n  };\n}\n\nexport default async function BlogPostPage({ params }: { params: { slug: string } }) {\n  const post = await getPostBySlug(params.slug);\n  if (!post) notFound();\n  \n  return (\n    <article style={{ maxWidth: '720px', margin: '0 auto', padding: '80px 24px 96px' }}>\n      <JsonLd data={{\n        '@context': 'https://schema.org',\n        '@type': 'Article',\n        headline: post.title,\n        author: { '@type': 'Person', name: post.author },\n        datePublished: post.date,\n        description: post.description,\n        publisher: { '@type': 'Organization', name: 'DÉDALO · Arquitectura de Protección' },\n      }} />\n      \n      {/* Header */}\n      <header style={{ marginBottom: '48px' }}>\n        <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: post.categoryColor }}>{post.category}</span>\n        <h1 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, color: 'var(--text)', lineHeight: 1.2, letterSpacing: '-0.02em', marginTop: '12px', marginBottom: '16px' }}>{post.title}</h1>\n        <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--muted)' }}>\n          <span>{post.author}</span>\n          <span>·</span>\n          <span>{new Date(post.date).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</span>\n          <span>·</span>\n          <span>{post.readTime} lectura</span>\n        </div>\n      </header>\n      \n      {/* Imagen de portada placeholder */}\n      <div style={{ width: '100%', aspectRatio: '16/7', background: 'linear-gradient(135deg, var(--surface), var(--card))', borderRadius: '12px', marginBottom: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>\n        <span style={{ fontSize: '48px', opacity: 0.3 }}>📝</span>\n      </div>\n      \n      {/* Contenido MDX */}\n      <div className=\"prose-dedalo\">{/* MDX content aquí */}</div>\n      \n      <ShareButtons title={post.title} url={`https://dedaloproteccion.mx/blog/${params.slug}`} />\n      <BlogCTA />\n    </article>\n  );\n}\n```\n\nAgregar estilos tipográficos para el contenido del artículo en globals.css:\n```css\n.prose-dedalo h2 { font-size: 24px; font-weight: 700; color: var(--text); margin: 40px 0 16px; }\n.prose-dedalo p { font-size: 16px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }\n.prose-dedalo ul, .prose-dedalo ol { color: var(--muted); line-height: 1.8; padding-left: 24px; margin-bottom: 20px; }\n.prose-dedalo strong { color: var(--text); font-weight: 600; }\n.prose-dedalo a { color: var(--accent-gold); }\n```",
+        "testStrategy": "Navegar a /blog/que-cubre-gmm y verificar que el artículo se renderiza correctamente con todos los elementos (header, imagen, contenido, compartir, CTA). Verificar que el title de la pestaña del navegador es el título del artículo. Verificar que navegar a /blog/slug-inexistente devuelve 404.",
+        "priority": "high",
+        "dependencies": [
+          "7",
+          "24",
+          "18",
+          "19"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "26",
+        "title": "Añadir animaciones sutiles con CSS transitions en componentes interactivos",
+        "description": "Implementar transiciones y animaciones sutiles en los elementos interactivos del sitio: tarjetas, botones, el menú de navegación y el diagrama de resultados del diagnóstico.",
+        "details": "El sitio ya tiene muchas transiciones básicas (200ms en color, background). Mejorar la experiencia con:\n\n**1. Animación de entrada para secciones en Home:**\nUsar Intersection Observer nativo (sin librerías) para fade-in en secciones:\n```css\n@keyframes fadeInUp {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n.animate-on-scroll {\n  animation: fadeInUp 0.5s ease forwards;\n}\n```\n\n**2. Mejora en las tarjetas de servicios:**\nAgregar `box-shadow` en hover para las service-cards del home:\n```css\n.service-card:hover { border-color: var(--border-gold); background: var(--surface); box-shadow: 0 8px 32px rgba(201,168,76,0.08); transform: translateY(-2px); }\n.service-card { transition: border-color 200ms, background 200ms, transform 200ms, box-shadow 200ms; }\n```\n\n**3. Score circle del diagnóstico:**\nEl SVG circle ya tiene `transition: stroke-dashoffset 1.5s ease` — OK.\n\n**4. Blog cards:**\nYa tienen `transform: translateY(-2px)` en hover — OK.\n\n**5. Menú mobile:** Agregar transición al abrir/cerrar:\n```css\n.mobile-menu { animation: slideDown 0.2s ease; }\n@keyframes slideDown {\n  from { opacity: 0; transform: translateY(-8px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n```\n\nNota: NO instalar Framer Motion para evitar peso adicional al bundle. Las animaciones CSS son suficientes y más performantes.",
+        "testStrategy": "Verificar visualmente que las animaciones se ejecutan suavemente en desktop y móvil. Usar Chrome DevTools Performance para confirmar que las animaciones se ejecutan en la GPU (transform/opacity) y no causan layout thrashing. Verificar que las animaciones no interfieren con la accesibilidad (usar prefers-reduced-motion).",
+        "priority": "low",
+        "dependencies": [
+          "3"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "27",
+        "title": "Implementar prefers-reduced-motion para accesibilidad en animaciones",
+        "description": "Asegurar que todas las animaciones CSS respetan la preferencia del sistema operativo de movimiento reducido, mejorando la accesibilidad del sitio.",
+        "details": "Agregar en globals.css al final del archivo:\n\n```css\n@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after {\n    animation-duration: 0.01ms !important;\n    animation-iteration-count: 1 !important;\n    transition-duration: 0.01ms !important;\n    scroll-behavior: auto !important;\n  }\n}\n```\n\nEsto desactiva todas las animaciones y transiciones para usuarios que tienen activada la opción 'Reducir movimiento' en su sistema operativo.\n\nAdicional: Revisar que todos los elementos interactivos tienen `:focus-visible` correctamente definido (ya está en globals.css con `outline: 2px solid var(--accent-blue)`).\n\nRevisar accesibilidad adicional:\n- Todos los botones tienen `aria-label` cuando solo tienen iconos\n- El menú hamburger ya tiene `aria-label=\"Menú\"` ✓\n- Las imágenes tienen texto alt descriptivo\n- El contraste de colores cumple WCAG AA (el dorado #C9A84C sobre fondo oscuro #060C1A tiene ratio > 4.5:1)\n- Los campos del formulario de diagnóstico tienen labels asociados",
+        "testStrategy": "En macOS, ir a Preferencias del Sistema → Accesibilidad → Pantalla → Reducir movimiento. Navegar por el sitio y verificar que las animaciones no se ejecutan. Usar axe o Lighthouse Accessibility para auditar el score de accesibilidad. Verificar con el simulador de contraste que los textos principales cumplen WCAG AA.",
+        "priority": "low",
+        "dependencies": [
+          "26"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "28",
+        "title": "Verificar y corregir el build de producción sin errores ni warnings",
+        "description": "Ejecutar el build completo de Next.js y resolver todos los errores de TypeScript, ESLint y warnings críticos antes del deploy a Vercel.",
+        "details": "Ejecutar la secuencia de verificación:\n\n```bash\n# 1. Verificar tipos TypeScript\nnpx tsc --noEmit\n\n# 2. Build de producción\nnpm run build\n\n# 3. Verificar el output\n# Debe mostrar todas las rutas generadas:\n# / (home) - Static\n# /diagnostico - Static\n# /agenda - Static\n# /sobre-mi - Static\n# /blog - Static\n# /blog/que-cubre-gmm - Static\n# /blog/seguro-de-vida-calculo - Static\n# /blog/errores-seguro-auto - Static\n# /sitemap.xml - Static\n# /robots.txt - Static\n\n# 4. Iniciar en modo producción local\nnpm run start\n```\n\nProblemas comunes a resolver:\n- Importaciones de módulos no encontrados\n- Tipos TypeScript incorrectos en los posts del blog\n- 'use client' faltante en componentes que usan hooks\n- Imágenes sin width/height\n- Links con href undefined\n- Variables de entorno NEXT_PUBLIC faltantes (usar valores de desarrollo)\n\nVerificar que el bundle size es razonable:\n- First Load JS < 100KB para las páginas principales\n- DiagnosticoForm puede ser más grande por su lógica, cargarlo con dynamic() si supera 150KB",
+        "testStrategy": "El test es el propio build: `npm run build` debe completarse sin errores. `npx tsc --noEmit` debe completarse sin errores de tipo. Navegar por todas las páginas del sitio en modo producción local (npm start) y verificar que todas cargan correctamente. Verificar en Vercel que el deployment fue exitoso.",
+        "priority": "high",
+        "dependencies": [
+          "2",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "17",
+          "20",
+          "21",
+          "24",
+          "25"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "29",
+        "title": "Testing de integraciones en producción: Cal.com, Make webhook, GA4",
+        "description": "Realizar pruebas end-to-end de todas las integraciones en el entorno de producción después del deploy en Vercel.",
+        "details": "Checklist de pruebas en producción (https://dedaloproteccion.mx):\n\n**Diagnóstico + Webhook Make → Notion:**\n1. Completar el diagnóstico completo en producción con datos reales\n2. Verificar en Make.com que el escenario se ejecutó (historial de ejecuciones)\n3. Verificar en la base de datos de Notion que aparece el nuevo registro con todos los campos\n4. Verificar que el registro tiene la etapa 'NUEVO' y todos los campos mapeados correctamente\n5. Probar los 4 perfiles posibles completando el diagnóstico con diferentes combinaciones de respuestas\n\n**Cal.com:**\n1. Acceder a /agenda y verificar que el widget carga\n2. Seleccionar una fecha y hora disponible\n3. Ingresar datos de contacto y confirmar la cita\n4. Verificar que llega email de confirmación al correo del prospecto\n5. Verificar que llega notificación a jose@dedaloproteccion.mx\n6. Cancelar la cita de prueba\n\n**Google Analytics 4:**\n1. Acceder al sitio y navegar entre páginas\n2. En GA4 → Real-Time, verificar que aparecen los pageviews\n3. Completar el diagnóstico y verificar que llega el evento 'diagnostico_completado'\n\n**WhatsApp links:**\n1. Click en todos los links de WhatsApp del sitio (footer, agenda, sobre-mi)\n2. Verificar que todos abren wa.me/526861085164\n\n**Email:**\n1. Click en jose@dedaloproteccion.mx en footer y sobre-mi\n2. Verificar que abre el cliente de email con la dirección correcta",
+        "testStrategy": "Completar el checklist completo documentando el resultado de cada prueba. Cualquier falla debe generar una tarea de corrección inmediata. Repetir las pruebas críticas (diagnóstico → Make → Notion, Cal.com) al menos 2 veces para confirmar consistencia.",
+        "priority": "high",
+        "dependencies": [
+          "6",
+          "13",
+          "22",
+          "23",
+          "28"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "30",
+        "title": "Auditoría final SEO y Core Web Vitals en producción",
+        "description": "Realizar la auditoría completa de SEO y performance en el sitio de producción usando Lighthouse, PageSpeed Insights y Google Search Console.",
+        "details": "**1. Lighthouse Audit (por cada página):**\nEjecutar Lighthouse en modo Incognito para Home, Diagnóstico, Blog, Agenda, Sobre mí:\n- Performance > 85\n- SEO > 95\n- Accessibility > 90\n- Best Practices > 95\n\n**2. Google Search Console:**\n1. Agregar la propiedad dedaloproteccion.mx en Search Console\n2. Verificar propiedad vía el meta tag de verificación o DNS\n3. Enviar el sitemap.xml manualmente\n4. Revisar que no hay errores de cobertura (páginas no indexadas por error)\n\n**3. PageSpeed Insights (web.dev/measure):**\n- Ingresar https://dedaloproteccion.mx y obtener el reporte\n- Documentar los valores de LCP, FID/INP, CLS\n- Resolver cualquier issue de 'Opportunities' que impacte significativamente el score\n\n**4. Verificación de meta tags:**\nUsar https://metatags.io con cada URL para verificar:\n- Title y description se muestran correctamente\n- og:image aparece en el preview de WhatsApp y LinkedIn\n- Twitter Card funciona correctamente\n\n**5. Verificación de structured data:**\nUsar https://search.google.com/test/rich-results con las URLs:\n- Home: LocalBusiness/ProfessionalService\n- Sobre mí: Person\n- Artículos: Article\n\n**6. Verificación de sitemap:**\nAcceder a https://dedaloproteccion.mx/sitemap.xml y verificar que incluye todas las páginas. Confirmar en Search Console que el sitemap fue procesado sin errores.",
+        "testStrategy": "Documentar todos los scores de Lighthouse en una tabla comparativa. Confirmar que LCP < 2.5s, CLS < 0.1 en producción. Verificar que el sitemap fue aceptado por Google Search Console. Cualquier score de SEO < 90 debe ser investigado y corregido antes de dar el sitio por completo.",
+        "priority": "medium",
+        "dependencies": [
+          "10",
+          "11",
+          "12",
+          "13",
+          "20",
+          "28",
+          "29"
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2026-04-24T21:50:47.382Z",
+      "taskCount": 30,
+      "completedCount": 10,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}

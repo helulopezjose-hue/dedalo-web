@@ -3,7 +3,14 @@ import DiagnosticoForm from "@/components/DiagnosticoForm";
 
 export const metadata: Metadata = {
   title: "Diagnóstico de Protección",
-  description: "15 preguntas. Resultado inmediato. Descubre tus brechas de protección sin costo.",
+  description: "15 preguntas, resultado inmediato. Descubre tus brechas reales de protección en seguros de Vida, GMM, Auto y Hogar. Gratuito.",
+  openGraph: {
+    title: "Diagnóstico gratuito de seguros | DÉDALO",
+    description: "15 preguntas. Resultado personalizado inmediato. Descubre qué cobertura necesitas realmente.",
+    url: "https://dedaloproteccion.mx/diagnostico",
+    type: "website",
+  },
+  alternates: { canonical: "https://dedaloproteccion.mx/diagnostico" },
 };
 
 export default function DiagnosticoPage() {

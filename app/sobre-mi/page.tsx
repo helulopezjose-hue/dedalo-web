@@ -3,14 +3,21 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Sobre mí",
-  description: "José G. Helú — Asesor de seguros con Cédula A. DÉDALO · Arquitectura de Protección.",
+  description: "José G. Helú — Asesor de seguros con Cédula A. Diseño estructuras de protección personalizadas en Vida, GMM, Auto y Hogar en México.",
+  openGraph: {
+    title: "José G. Helú · Asesor de Seguros | DÉDALO",
+    description: "Asesor de seguros con Cédula A. Estructuras de protección personalizadas en México.",
+    url: "https://dedaloproteccion.mx/sobre-mi",
+    type: "profile",
+  },
+  alternates: { canonical: "https://dedaloproteccion.mx/sobre-mi" },
 };
 
 const credentials = ["Cédula A", "AXA México", "Vida", "GMM", "Auto", "Hogar"];
 
 export default function SobreMiPage() {
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 24px 96px" }}>
+    <div className="section-md">
       <style>{`
         .sobre-cta { display: inline-block; background: var(--accent-blue); color: #fff; font-size: 15px; font-weight: 600; padding: 13px 28px; border-radius: 8px; text-decoration: none; transition: background 200ms; }
         .sobre-cta:hover { background: var(--accent-blue-light); }
@@ -46,7 +53,7 @@ export default function SobreMiPage() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ width: "100%", maxWidth: "280px", aspectRatio: "1", borderRadius: "16px", background: "var(--card)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "10px" }}>
+          <div className="sobre-mi-photo" style={{ width: "100%", maxWidth: "280px", aspectRatio: "1", borderRadius: "16px", background: "var(--card)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "10px" }}>
             <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "var(--accent-gold-muted)", border: "1px solid var(--border-gold)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", fontWeight: 800, color: "var(--accent-gold)" }}>
               JH
             </div>

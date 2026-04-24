@@ -44,6 +44,14 @@ export default function Footer() {
               <a href="mailto:jose@dedaloproteccion.mx" className="footer-contact-link">
                 jose@dedaloproteccion.mx
               </a>
+              <a
+                href="https://wa.me/526861085164"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-contact-link"
+              >
+                WhatsApp: 686 108 5164
+              </a>
               <Link href="/agenda" className="footer-agenda-link">Agendar consulta →</Link>
             </div>
           </div>

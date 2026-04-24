@@ -15,6 +15,16 @@ export const metadata: Metadata = {
     siteName: "DÉDALO · Arquitectura de Protección",
     locale: "es_MX",
     type: "website",
+    url: "https://dedaloproteccion.mx",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@dedaloproteccion",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 

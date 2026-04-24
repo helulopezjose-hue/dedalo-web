@@ -14,7 +14,7 @@ const posts = [
 
 export default function BlogPage() {
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 24px 96px" }}>
+    <div className="section-md">
       <style>{`
         .blog-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 200ms, transform 200ms; display: flex; flex-direction: column; text-decoration: none; }
         .blog-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }

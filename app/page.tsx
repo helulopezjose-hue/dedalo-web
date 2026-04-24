@@ -44,7 +44,7 @@ export default function HomePage() {
       `}</style>
 
       {/* Hero */}
-      <section style={{ maxWidth: "1100px", margin: "0 auto", padding: "100px 24px 96px" }}>
+      <section className="page-hero">
         <div className="label-tag" style={{ marginBottom: "24px" }}>ASESORÍA DE SEGUROS · CÉDULA A</div>
         <h1 style={{ fontSize: "clamp(44px, 6vw, 64px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, color: "var(--text)", marginBottom: "24px", maxWidth: "680px" }}>
           Tu protección,<br /><span style={{ color: "var(--accent-gold)" }}>arquitectada.</span>
@@ -60,8 +60,8 @@ export default function HomePage() {
       </section>
 
       {/* Servicios */}
-      <section style={{ borderTop: "1px solid var(--border)", padding: "96px 0" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
+      <section className="section-lg" style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="page-container">
           <div className="label-tag" style={{ marginBottom: "16px" }}>SERVICIOS</div>
           <h2 style={{ fontSize: "30px", fontWeight: 600, color: "var(--text)", marginBottom: "48px", letterSpacing: "-0.01em" }}>Líneas de protección</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
@@ -77,8 +77,8 @@ export default function HomePage() {
       </section>
 
       {/* Proceso */}
-      <section style={{ borderTop: "1px solid var(--border)", padding: "96px 0", background: "var(--surface)" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
+      <section className="section-lg" style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}>
+        <div className="page-container">
           <div className="label-tag" style={{ marginBottom: "16px" }}>PROCESO</div>
           <h2 style={{ fontSize: "30px", fontWeight: 600, color: "var(--text)", marginBottom: "56px", letterSpacing: "-0.01em" }}>Cómo trabajo contigo</h2>
           <div className="steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0, position: "relative" }}>
@@ -97,8 +97,8 @@ export default function HomePage() {
       </section>
 
       {/* Testimonios */}
-      <section style={{ borderTop: "1px solid var(--border)", padding: "96px 0" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
+      <section className="section-lg" style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="page-container">
           <div className="label-tag" style={{ marginBottom: "16px" }}>TESTIMONIOS</div>
           <h2 style={{ fontSize: "30px", fontWeight: 600, color: "var(--text)", marginBottom: "48px", letterSpacing: "-0.01em" }}>Lo que dicen quienes ya hicieron su diagnóstico</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
@@ -121,7 +121,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Final */}
-      <section style={{ borderTop: "1px solid var(--border-gold)", padding: "96px 0", background: "var(--surface)" }}>
+      <section className="section-lg" style={{ borderTop: "1px solid var(--border-gold)", background: "var(--surface)" }}>
         <div style={{ maxWidth: "640px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <div className="label-tag" style={{ marginBottom: "20px" }}>DIAGNÓSTICO GRATUITO</div>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.01em", marginBottom: "16px", lineHeight: 1.2 }}>

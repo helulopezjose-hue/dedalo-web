@@ -2,12 +2,19 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Agenda una consulta",
-  description: "La primera sesión es gratuita. 30 minutos para entender tu situación y saber exactamente qué necesitas.",
+  description: "La primera sesión es gratuita. 30 minutos para entender tu situación y diseñar la cobertura de seguros que realmente necesitas.",
+  openGraph: {
+    title: "Agenda una consulta gratuita | DÉDALO",
+    description: "30 minutos para entender tu situación. Sin presión ni compromiso.",
+    url: "https://dedaloproteccion.mx/agenda",
+    type: "website",
+  },
+  alternates: { canonical: "https://dedaloproteccion.mx/agenda" },
 };
 
 export default function AgendaPage() {
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 24px 96px" }}>
+    <div className="section-md">
       <style>{`
         .contact-card { display: flex; align-items: center; gap: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-decoration: none; transition: border-color 200ms; }
         .contact-card-wa:hover { border-color: #25D366; }

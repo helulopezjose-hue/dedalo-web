@@ -1,0 +1,214 @@
+# PRD: dedaloproteccion.mx
+# Sitio web de asesoría de seguros para José G. Helú
+# Marca: DÉDALO · Arquitectura de Protección
+
+## OBJETIVO GENERAL
+Sitio production-ready con UX completa, contenido real y todas las integraciones funcionando para el negocio de asesoría de seguros de José G. Helú bajo la marca DÉDALO · Arquitectura de Protección.
+
+## STACK TECNOLÓGICO
+- Framework: Next.js 16 con App Router
+- Estilos: Tailwind CSS 4
+- Lenguaje: TypeScript
+- Deploy: Vercel
+- Dominio: dedaloproteccion.mx
+
+---
+
+## MÓDULO 1: DISEÑO Y UX GLOBAL
+
+### Objetivo
+Consistencia visual y de experiencia en todas las páginas del sitio.
+
+### Requerimientos
+1.1. Revisión y corrección de consistencia de marca (colores, tipografías, espaciados) en todas las páginas.
+1.2. Navegación funcional entre todas las secciones con menú responsive (hamburger en móvil).
+1.3. Responsividad completa para desktop (1440px), tablet (768px) y móvil (375px).
+1.4. Estados de hover, focus y active implementados en todos los elementos interactivos (botones, links, inputs).
+1.5. Transiciones y animaciones sutiles usando CSS o Framer Motion.
+1.6. Página 404 personalizada con branding DÉDALO y CTA para volver al inicio.
+1.7. Loading states (skeletons o spinners) en componentes que hagan fetch de datos.
+1.8. Footer completo con links, datos de contacto y WhatsApp.
+
+---
+
+## MÓDULO 2: HOME (/)
+
+### Objetivo
+Página principal que comunica la propuesta de valor y convierte visitantes en leads.
+
+### Requerimientos
+2.1. Copy final revisado y aprobado en todas las secciones.
+2.2. Sección Hero con:
+  - Headline principal
+  - Subheadline descriptivo
+  - CTA primario "Hacer diagnóstico" → /diagnostico
+  - CTA secundario "Agendar cita" → /agenda
+  - Imagen o ilustración de hero
+2.3. Sección Servicios con 4 tarjetas (Vida, GMM, Auto, Hogar), cada una con link a página de detalle futura.
+2.4. Sección Proceso con 3 pasos: Diagnóstico → Propuesta → Protección.
+2.5. Sección Testimonios con mínimo 3 testimonios reales o placeholder.
+2.6. Sección CTA final con botón funcional hacia /agenda.
+
+---
+
+## MÓDULO 3: DIAGNÓSTICO (/diagnostico)
+
+### Objetivo
+Herramienta interactiva que evalúa las necesidades de seguros del visitante y genera un perfil personalizado.
+
+### Requerimientos
+3.1. Componente DiagnosticoForm completamente funcional con flujo multi-paso:
+  - Sección 1: Datos personales (nombre, edad, estado civil, dependientes)
+  - Sección 2: Situación laboral (empleado, independiente, empresario)
+  - Sección 3: Patrimonio y activos (vehículos, inmuebles)
+  - Sección 4: Salud y preexistencias
+  - Sección 5: Objetivos de protección
+3.2. Navegación entre secciones con botones "Siguiente" y "Atrás", barra de progreso visual.
+3.3. Validación de campos requeridos antes de avanzar.
+3.4. Lógica de scoring: algoritmo que asigna puntos por respuesta y determina un perfil de protección.
+3.5. Perfiles posibles: Básico, Esencial, Completo, Premium (4 perfiles).
+3.6. Página de resultado personalizada por perfil mostrando:
+  - Nombre del perfil
+  - Descripción de necesidades identificadas
+  - Seguros recomendados
+  - Botón "Agendar cita con José" → /agenda
+3.7. Webhook POST a Make/Integromat para enviar datos del diagnóstico a Notion.
+  - URL del webhook en variable de entorno: NEXT_PUBLIC_MAKE_WEBHOOK_URL
+  - Datos a enviar: nombre, email, teléfono, perfil asignado, respuestas clave, timestamp
+3.8. Variables de entorno configuradas en Vercel para producción.
+3.9. Estado de loading durante envío del webhook, confirmación o manejo de error.
+
+---
+
+## MÓDULO 4: BLOG (/blog)
+
+### Objetivo
+Contenido educativo sobre seguros que posiciona a José como experto y genera tráfico orgánico.
+
+### Requerimientos
+4.1. Layout de listado de artículos con diseño editorial limpio.
+4.2. Sistema de categorías: Vida, GMM, Auto, Hogar, Educación.
+4.3. Filtrado por categoría funcional en la página de listado.
+4.4. Mínimo 3 artículos reales publicados con contenido completo (500-1000 palabras cada uno):
+  - Artículo 1: "¿Por qué necesitas un seguro de vida?" (categoría: Vida)
+  - Artículo 2: "GMM vs IMSS: ¿Cuál te conviene más?" (categoría: GMM)
+  - Artículo 3: "5 errores al contratar tu seguro de auto" (categoría: Auto)
+4.5. Páginas individuales de artículo con:
+  - Título, autor, fecha, categoría
+  - Imagen de portada
+  - Contenido en Markdown o MDX
+  - Tiempo estimado de lectura
+4.6. Botones para compartir en redes sociales (Twitter/X, WhatsApp, LinkedIn) en cada artículo.
+4.7. CTA al diagnóstico al final de cada artículo.
+4.8. SEO por artículo:
+  - Meta title y description únicos
+  - og:image por artículo
+  - Structured data (Article schema) para Google
+  - URL amigable: /blog/[slug]
+
+---
+
+## MÓDULO 5: AGENDA (/agenda)
+
+### Objetivo
+Sistema de agendado de citas que conecta prospectos directamente con José.
+
+### Requerimientos
+5.1. Integración embebida con Cal.com o Calendly (preferir Cal.com por ser open source).
+5.2. Configuración de horario: Lunes a Viernes 9am-9pm, hora Baja California (America/Tijuana, PST/PDT).
+5.3. Duración de cita: 30 minutos.
+5.4. Disponibilidad visible en primeras 48 horas.
+5.5. Confirmación automática por email al prospecto al agendar.
+5.6. Notificación automática a José al agendar (email: jose@dedaloproteccion.mx).
+5.7. Enlace de WhatsApp directo: https://wa.me/526861085164 como alternativa.
+5.8. Diseño de la página consistente con el resto del sitio.
+
+---
+
+## MÓDULO 6: SOBRE MÍ (/sobre-mi)
+
+### Objetivo
+Página que construye confianza y credibilidad de José G. Helú como asesor de seguros.
+
+### Requerimientos
+6.1. Contenido completo con historia personal y profesional.
+6.2. Espacio reservado para foto de perfil profesional (pendiente de José, usar placeholder hasta entonces).
+6.3. Sección de credenciales y certificaciones.
+6.4. Especialidades: seguros de vida, GMM, auto, hogar.
+6.5. Años de experiencia y número de clientes atendidos (datos reales o estimados).
+6.6. CTA hacia /agenda.
+6.7. Enlace de contacto por WhatsApp.
+
+---
+
+## MÓDULO 7: SEO Y PERFORMANCE
+
+### Requerimientos
+7.1. Meta tags completos en todas las páginas (title, description, robots).
+7.2. og:image único por página (mínimo 1200x630px).
+7.3. sitemap.xml generado automáticamente con Next.js.
+7.4. robots.txt correctamente configurado.
+7.5. Títulos y descripciones optimizados para keywords: seguros México, asesor de seguros, seguro de vida México, seguro gastos médicos mayores.
+7.6. Integración de Google Analytics 4 o Plausible Analytics.
+7.7. Core Web Vitals optimizados: LCP <2.5s, FID <100ms, CLS <0.1.
+7.8. Imágenes optimizadas con next/image.
+7.9. Fuentes con font-display: swap.
+
+---
+
+## MÓDULO 8: INTEGRACIONES
+
+### Requerimientos
+8.1. Webhook Make → Notion: Recibir datos del diagnóstico y crear registro en base de datos Notion de leads.
+8.2. Sistema de agenda Cal.com o Calendly: Widget embebido funcional.
+8.3. WhatsApp Business link: https://wa.me/526861085164 con mensaje predefinido.
+8.4. Email de contacto: jose@dedaloproteccion.mx visible en header/footer.
+8.5. Todas las integraciones testeadas en entorno de producción.
+
+---
+
+## MÓDULO 9: SEGURIDAD Y PRODUCCIÓN
+
+### Requerimientos
+9.1. Todas las API keys y tokens en variables de entorno, nunca en código.
+9.2. .env.example con todas las variables necesarias documentadas (sin valores reales).
+9.3. Headers de seguridad en next.config.ts: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Content-Security-Policy básico.
+9.4. HTTPS activo (gestionado por Vercel).
+9.5. Variables de entorno configuradas en Vercel dashboard para producción.
+9.6. Build de producción sin errores ni warnings críticos.
+9.7. Revisión de console.log y código de debug eliminado.
+
+---
+
+## ORDEN DE EJECUCIÓN RECOMENDADO
+
+FASE 1 - Fundamentos (Semana 1):
+- Diseño y UX global (navegación, responsividad, estados interactivos)
+- Home: copy final y todas las secciones
+- Página 404
+
+FASE 2 - Features core (Semana 2):
+- Diagnóstico: formulario completo + lógica de scoring
+- Diagnóstico: webhook Make → Notion
+- Agenda: integración Cal.com/Calendly
+
+FASE 3 - Contenido y SEO (Semana 3):
+- Blog: listado, categorías, 3 artículos
+- Sobre Mí: contenido completo
+- SEO: meta tags, sitemap, og:images
+
+FASE 4 - Producción (Semana 4):
+- Google Analytics
+- Headers de seguridad
+- Variables de entorno en Vercel
+- Testing completo
+- Core Web Vitals
+
+---
+
+## DATOS DE CONTACTO DEL PROYECTO
+- Propietario: José G. Helú
+- WhatsApp: 6861085164
+- Email: jose@dedaloproteccion.mx
+- Dominio: dedaloproteccion.mx
+- Deploy: Vercel
